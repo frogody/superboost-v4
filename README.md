@@ -97,7 +97,7 @@ Requires **Claude Code ≥ 2.1.170** (for Fable 5) — run `claude update` if ne
 
 User feedback on 5.4.0: *"it looks like a circus."* Correct. The steady-state bar now renders **neutral slate unless something needs you**: single-hue RAM bar (amber ≥75%, red ≥85%), neutral readouts until pressure, desaturated churn, gold *text* instead of a gold slab for the model chip. Color belongs to events (washes) and alerts (`200K+`, ctx ≥85%, `tight`/`solo`) — and now it's the exception, so it reads. Measured: 28 → 11 distinct colors in a steady-state render.
 
-**v5.4.2 adds the wash dial:** `SUPERBOOST_FX_INTENSITY=low` keeps every event visible at ~half the luminance (0.48× measured); `off` drops the canvas wash entirely and keeps the label chip. Default `normal` stays the screenshot-verified punchy level.
+**v5.4.2 adds the wash dial:** `SUPERBOOST_FX_INTENSITY=low` keeps every event visible at ~half the luminance (0.48× measured); `off` drops the canvas wash entirely and keeps the label chip. The shipped `settings.json` now sets `low` out of the box (the script default without the env var remains `normal`).
 
 ---
 

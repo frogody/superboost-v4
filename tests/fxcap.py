@@ -17,8 +17,11 @@ RICH = json.dumps({
 SGR = re.compile(r"\x1b\[([0-9;]*)m")
 
 def render(cols=160):
+    # pin the reference intensity: the host env may carry the shipped
+    # settings.json value (low), and CC hot-applies settings env
     p = subprocess.run([SL], input=RICH, capture_output=True, text=True,
-                       env={**os.environ, "COLUMNS": str(cols)})
+                       env={**os.environ, "COLUMNS": str(cols),
+                            "SUPERBOOST_FX_INTENSITY": "normal"})
     return p.stdout.rstrip("\n")
 
 def cells(frame):

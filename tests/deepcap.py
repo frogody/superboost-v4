@@ -24,8 +24,10 @@ HEART_RGB = (32, 36, 46)  # base(22,24,31) + 14% toward slate(100,116,139)
 
 def render_timed():
     t0 = time.time()
+    # reference intensity pinned — the host env may carry settings.json's low
     p = subprocess.run([SL], input=RICH, capture_output=True, text=True,
-                       env={**os.environ, "COLUMNS": str(COLS)})
+                       env={**os.environ, "COLUMNS": str(COLS),
+                            "SUPERBOOST_FX_INTENSITY": "normal"})
     return p.stdout.rstrip("\n"), (time.time() - t0) * 1000
 
 def capture(event, label, r, g, b, seconds=7.5, fps=3):

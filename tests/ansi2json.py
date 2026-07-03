@@ -46,7 +46,8 @@ def capture_statusline(event, label, r, g, b, seconds=7, fps=3):
     frames = []
     for k in range(seconds * fps):
         out = subprocess.run([sl], input=rich, capture_output=True, text=True,
-                             env={**os.environ, "COLUMNS": "150"}).stdout.rstrip("\n")
+                             env={**os.environ, "COLUMNS": "150",
+                                  "SUPERBOOST_FX_INTENSITY": "normal"}).stdout.rstrip("\n")
         frames.append(line_to_segments(out))
         time.sleep(1.0 / fps)
     os.remove(state)

@@ -5,6 +5,12 @@
 
 HOOKS="$HOME/.claude/hooks"
 TESTS="$HOME/.claude/tests"
+# The suite verifies REFERENCE (normal) FX behavior regardless of the host
+# environment — settings.json ships SUPERBOOST_FX_INTENSITY=low and Claude
+# Code hot-applies settings env to tool processes (discovered when the
+# heartbeat check failed minutes after the settings change). The dial test
+# sets its own levels explicitly.
+export SUPERBOOST_FX_INTENSITY=normal
 SL="$HOOKS/superboost-statusline.sh"
 FX="$HOOKS/superboost-fx.sh"
 STATE="${SUPERBOOST_FX_DIR:-$HOME/.claude/fx}/state"

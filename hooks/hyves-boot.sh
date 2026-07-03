@@ -1,6 +1,6 @@
 #!/bin/bash
-# hyves-boot.sh — HYVES CODE V5 cinematic boot reveal (Superboost v5.2)
-# Part of Claude Code Superboost by ISYNCSO (https://isyncso.com)
+# hyves-boot.sh — HYVES CODE V5 cinematic boot reveal
+# Part of HYVES CODE by ISYNCSO (https://isyncso.com)
 #
 # An nms/Sneakers-style "decrypt" of the HYVES CODE logo: every glyph holds a
 # random symbol for a randomized number of frames, then resolves — fresh
@@ -20,9 +20,9 @@ BANNER_OUT="$("$HOME/.claude/hooks/superboost-banner.sh" 2>/dev/null)"
 # clean-boot branch: "... boot OK (28/28 checks), RAM 46.5 GB free, HEALTHY."
 STATUS_LINE="$(printf '%s\n' "$BANNER_OUT" \
   | sed -n 's/.*boot OK (\([0-9]*\/[0-9]*\) checks), RAM \([0-9.]*\) GB free, \([A-Z]*\).*/boot OK · \1 checks · RAM \2 GB free · \3/p' | head -1)"
-# issues branch footer: "(Superboost v5.2 | <icon> 26/29 checks | RAM 46.5 GB free | HEALTHY)"
+# issues branch footer: "(HYVES CODE v5.2.1 | <icon> 26/29 checks | RAM 46.5 GB free | HEALTHY)"
 [ -z "$STATUS_LINE" ] && STATUS_LINE="$(printf '%s\n' "$BANNER_OUT" \
-  | sed -n 's/.*(Superboost v[0-9.]* | .* \([0-9]*\/[0-9]*\) checks | RAM \([0-9.]*\) GB free | \([A-Z]*\)).*/\1 checks (self-test found issues) · RAM \2 GB free · \3/p' | head -1)"
+  | sed -n 's/.*(HYVES CODE v[0-9.]* | .* \([0-9]*\/[0-9]*\) checks | RAM \([0-9.]*\) GB free | \([A-Z]*\)).*/\1 checks (self-test found issues) · RAM \2 GB free · \3/p' | head -1)"
 [ -z "$STATUS_LINE" ] && STATUS_LINE="self-test unavailable — run superboost-banner.sh"
 
 COLS=$(tput cols 2>/dev/null || echo 80)
@@ -104,5 +104,5 @@ printf '%s\n' "${D}   Holistic Yield & Validation Engines${R}"
 printf '\n'
 printf '   %sSYSTEMS ONLINE%s — %s\n' "$B" "$R" "$STATUS_LINE"
 # OSC 8 hyperlink (terminals without support show the plain label)
-printf '   %sby ISYNCSO · \033]8;;https://github.com/frogody/superboost-v5\033\\github.com/frogody/superboost-v5\033]8;;\033\\%s\n' "$D" "$R"
+printf '   %sby ISYNCSO · \033]8;;https://github.com/frogody/hyves-code\033\\github.com/frogody/hyves-code\033]8;;\033\\%s\n' "$D" "$R"
 exit 0

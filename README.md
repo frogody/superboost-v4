@@ -1,11 +1,13 @@
-# Superboost v5.2.1 "Hyves"
+# HYVES CODE V5
 
-![version](https://img.shields.io/badge/version-5.2.1%20%22Hyves%22-a855f7)
+*Holistic Yield & Validation Engines* — formerly **Superboost**. The internal hook scripts, env vars, and sentinels keep the historical `superboost-` prefix, so upgrading is a `git pull`, not a migration.
+
+![version](https://img.shields.io/badge/HYVES%20CODE-V5.2.1-a855f7)
 ![Claude Code](https://img.shields.io/badge/Claude%20Code-%E2%89%A5%202.1.170-22d3ee)
 ![tuned for](https://img.shields.io/badge/tuned%20for-Claude%20Fable%205-facc15)
 ![safety](https://img.shields.io/badge/auto--mode-guarded-22c55e)
 
-**Superboost is an operating layer for [Claude Code](https://claude.com/claude-code) that makes Claude Fable 5 in your terminal faster, safer, cheaper, and far nicer to use — without changing how you work.** You drop it into `~/.claude`, and every session boots with real safety guardrails, agents that scale to your machine's RAM, smart model tiering, and a colorized heads‑up display that reacts to what Claude is doing. It's the difference between *running* Fable 5 and *getting the most out of it*.
+**HYVES CODE is an operating layer for [Claude Code](https://claude.com/claude-code) that makes Claude Fable 5 in your terminal faster, safer, cheaper, and far nicer to use — without changing how you work.** You drop it into `~/.claude`, and every session boots with real safety guardrails, agents that scale to your machine's RAM, smart model tiering, and a colorized heads‑up display that reacts to what Claude is doing. It's the difference between *running* Fable 5 and *getting the most out of it*.
 
 Built by [ISYNCSO](https://isyncso.com). Zero dependencies, zero lock‑in — it's shell hooks and a `CLAUDE.md`, all in one folder you already have.
 
@@ -21,7 +23,7 @@ Claude Fable 5 is a phenomenal model: a 1M‑token context, always‑on adaptive
 - Fable's safety classifier can decline benign security work; if you don't know that, a normal refusal looks like a bug.
 - The terminal is a wall of monochrome text with no sense of what's happening.
 
-Superboost closes every one of those gaps. **It's the config layer that turns "Fable 5 in Claude Code" into a tuned cockpit.**
+HYVES CODE closes every one of those gaps. **It's the config layer that turns "Fable 5 in Claude Code" into a tuned cockpit.**
 
 ---
 
@@ -31,22 +33,22 @@ Superboost closes every one of those gaps. **It's the config layer that turns "F
 The default model is set to `fable[1m]` with a graceful‑degradation allowlist (if your org lacks Fable access, it falls back to Opus with a warning instead of failing). On top of that, a **Fable‑5 doctrine** baked into `CLAUDE.md` teaches Claude how to actually behave like Fable 5: state the *outcome and the why* instead of step‑by‑step scripts, delegate to async sub‑agents and keep working, don't over‑refactor at high effort, ground every progress claim in real tool output, and treat the safety‑classifier refusal (auto‑routed to Opus) as a known mode — not a failure. Every point is backed by a **verified deep‑research brief** ([`superboost-expertise-report.md`](./superboost-expertise-report.md), 25/25 claims confirmed against first‑party Anthropic docs).
 
 ### Agents that scale to your machine — the standout feature
-Superboost reads your live RAM and converts it into an **actionable fan‑out budget**: how many agents can run at once, what Workflow width to use, and a one‑word posture (`wide` / `balanced` / `narrow` / `solo`). It's emitted into context at session start and shown live in the status bar as `fanout~N`. When you have headroom, Superboost tells the orchestrator to **delegate wide and async** — exactly what Fable 5's dependable sub‑agents are built for. When RAM is tight, it says stay solo, and a guard hook physically blocks spawns that would thrash the machine. **This is the benefit plain Fable‑on‑Claude‑Code simply doesn't offer: parallelism that's matched to your hardware, automatically.**
+HYVES CODE reads your live RAM and converts it into an **actionable fan‑out budget**: how many agents can run at once, what Workflow width to use, and a one‑word posture (`wide` / `balanced` / `narrow` / `solo`). It's emitted into context at session start and shown live in the status bar as `fanout~N`. When you have headroom, HYVES CODE tells the orchestrator to **delegate wide and async** — exactly what Fable 5's dependable sub‑agents are built for. When RAM is tight, it says stay solo, and a guard hook physically blocks spawns that would thrash the machine. **This is the benefit plain Fable‑on‑Claude‑Code simply doesn't offer: parallelism that's matched to your hardware, automatically.**
 
 ### Safety that's actually enforced — not a checklist
-Auto‑mode (no permission prompts) is fast but risky. Superboost makes it safe with a real `PreToolUse` **deny hook** that blocks the catastrophic cases — `rm -rf` of `/` or `$HOME`, disk formatting, fork bombs, `git push --force`, secret exfiltration over the network, and edits to files you've locked — while deliberately allowing ordinary `git push`, deploys, and SQL. It's a guardrail the model *cannot* talk its way past, so you get the speed of auto‑mode without the exposure.
+Auto‑mode (no permission prompts) is fast but risky. HYVES CODE makes it safe with a real `PreToolUse` **deny hook** that blocks the catastrophic cases — `rm -rf` of `/` or `$HOME`, disk formatting, fork bombs, `git push --force`, secret exfiltration over the network, and edits to files you've locked — while deliberately allowing ordinary `git push`, deploys, and SQL. It's a guardrail the model *cannot* talk its way past, so you get the speed of auto‑mode without the exposure.
 
 ### A terminal you enjoy looking at
 The status bar is a **full‑width HUD painted with truecolor backgrounds** (new in 5.1): a violet brand chip, the model + effort level on a gold chip when you're on Fable, a wide green→amber→red RAM gradient bar, context‑window use, your fan‑out capacity, 5‑hour rate use, and session cost — edge to edge. Notable actions **flood the bar** with a quantized, dithered background wash in the action's color that pulses and decays — fan‑out is cyan, commits green, deploys indigo, edits amber, web research violet, and safety blocks fire red *from the guard itself*, so even a denied action is visible. Washes last `SUPERBOOST_FX_TTL` seconds (default 7). It's all done with zero‑width ANSI color on plain‑ASCII glyphs, so it never corrupts the terminal layout (a hard‑won lesson), and `SUPERBOOST_STATUSLINE_PLAIN=1` reverts to pure ASCII if you ever want it. (One macOS quirk: if the terminal window is fully covered, App Nap pauses redraws, so short‑lived washes can pass unseen — they resume the moment the window is visible.)
 
 ### Smart model tiering — pay for judgment, not grep
-Superboost's guidance tiers work across models: `fable` for orchestration, synthesis, and judgment; `sonnet` for implementation; `haiku` for cheap read‑only exploration. Cheap explorers + Sonnet workers + one Fable synthesizer gets you near‑frontier quality at a fraction of an all‑Fable bill — and it keeps the expensive model off mechanical work.
+HYVES CODE's guidance tiers work across models: `fable` for orchestration, synthesis, and judgment; `sonnet` for implementation; `haiku` for cheap read‑only exploration. Cheap explorers + Sonnet workers + one Fable synthesizer gets you near‑frontier quality at a fraction of an all‑Fable bill — and it keeps the expensive model off mechanical work.
 
 ---
 
 ## Why it's special
 
-1. **Enforce with hooks, don't narrate with ceremony.** Superboost doesn't ask the model to *remember* to be safe or efficient — it wires those behaviors into the harness where they can't be skipped, and keeps the model focused on your task instead of on rituals.
+1. **Enforce with hooks, don't narrate with ceremony.** HYVES CODE doesn't ask the model to *remember* to be safe or efficient — it wires those behaviors into the harness where they can't be skipped, and keeps the model focused on your task instead of on rituals.
 2. **It scales to *your* machine.** The RAM number isn't just a HUD stat — it's a budget the orchestrator acts on. More parallelism when you can afford it, none when you can't.
 3. **It's grounded in verified facts, not vibes.** The Fable‑5 tuning comes from a fact‑checked research pass against Anthropic's own docs, shipped alongside the config so you can audit every claim.
 4. **It's transparent and recoverable.** Everything is plain shell + Markdown in one git repo. No binary, no daemon, no telemetry. Read it, fork it, change it.
@@ -55,7 +57,7 @@ Superboost's guidance tiers work across models: `fable` for orchestration, synth
 
 ## How it makes Fable better in a Claude Code terminal
 
-| Fable 5 trait | Without Superboost | With Superboost |
+| Fable 5 trait | Without HYVES CODE | With HYVES CODE |
 |---|---|---|
 | Dependable async sub‑agents | Fans out, but blind to your RAM | Sizes fan‑out to a live RAM budget — wide when you can, solo when you can't |
 | Long, minutes‑long autonomous turns | Can drift, over‑build, or fabricate progress | Doctrine keeps it on‑rails: outcome‑first, no tidying, grounded progress, memory surface |
@@ -68,13 +70,13 @@ Superboost's guidance tiers work across models: `fable` for orchestration, synth
 
 ## Quick start
 
-Superboost lives in `~/.claude`, which Claude Code already reads. Clone it there (or copy the files in), then start a fresh session:
+HYVES CODE lives in `~/.claude`, which Claude Code already reads. Clone it there (or copy the files in), then start a fresh session:
 
 ```bash
 # back up an existing config first if you have one
-git clone https://github.com/frogody/superboost-v5.git ~/.claude
+git clone https://github.com/frogody/hyves-code.git ~/.claude
 ~/.claude/install.sh   # verify prereqs, bless checksums, self-test — ends with the HYVES boot cinema
-claude                 # boots "SUPERBOOST V5 ACTIVE", colorized HUD, Fable 5 default
+claude                 # opens with the HYVES CODE V5 boot banner, colorized HUD, Fable 5 default
 ```
 
 `install.sh` is idempotent (re-run it any time) and works from a checkout anywhere — run from outside `~/.claude` it backs up your existing `CLAUDE.md` / `settings.json` to a timestamped folder before copying the new ones in.
@@ -91,7 +93,10 @@ Requires **Claude Code ≥ 2.1.170** (for Fable 5) — run `claude update` if ne
 
 ---
 
-## What's new in v5.2.1 (regression pass, frame-capture verified)
+## What's new in v5.2.1 (rebrand + regression pass, frame-capture verified)
+
+- **HYVES CODE is the name.** The repo is now [`frogody/hyves-code`](https://github.com/frogody/hyves-code) (GitHub redirects the old `superboost-v5` URLs), the docs and installer say HYVES CODE, and the context sentinel is `HYVES CODE V5 ACTIVE`. Internal script filenames and `SUPERBOOST_*` env vars are unchanged — no rewiring on upgrade.
+- **Visible boot mark.** Each new session now *opens with a two-line HYVES CODE banner* (self-test result, free RAM, health, fan-out posture) rendered by the model from the SessionStart hook's context — the boot cinema itself stays installer-only, since hook stdout can never paint the terminal.
 
 Every claim below was verified from captured statusline frames (~3fps across the full 7s effect life) and a PTY boot-cinema capture — not by eyeballing.
 
@@ -159,4 +164,4 @@ Every claim below was verified from captured statusline frames (~3fps across the
 No secrets live in this repo. Credentials go in the macOS keychain via `superboost-secrets.sh` and are referenced by name — never written to a file, a commit, or a prompt. The `.gitignore` uses a strict whitelist, so session transcripts, logs, caches, and `.env` files can never be committed. No telemetry.
 
 ---
-*ISYNCSO · github.com/frogody/superboost-v5*
+*ISYNCSO · github.com/frogody/hyves-code*

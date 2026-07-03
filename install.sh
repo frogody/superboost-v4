@@ -1,6 +1,6 @@
 #!/bin/bash
-# install.sh — Superboost v5.2 "Hyves" installer / verifier
-# Part of Claude Code Superboost by ISYNCSO (https://isyncso.com)
+# install.sh — HYVES CODE V5 (v5.2.1) installer / verifier
+# Part of HYVES CODE by ISYNCSO (https://isyncso.com)
 #
 # Two modes, decided automatically:
 #   IN-PLACE  — run from a checkout that IS ~/.claude (the normal layout):
@@ -22,7 +22,7 @@ HOOKS_DIR="$CLAUDE_DIR/hooks"
 say()  { printf '%s\n' "$*"; }
 fail() { printf 'ERROR: %s\n' "$*" >&2; exit 1; }
 
-say "Superboost v5.2 \"Hyves\" — install/verify"
+say "HYVES CODE V5 (v5.2.1) — install/verify"
 say ""
 
 # ─── 1. Prerequisites ────────────────────────────────────────

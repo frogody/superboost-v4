@@ -1,14 +1,16 @@
 #!/bin/bash
-# superboost-banner.sh — SessionStart hook for Claude Code Superboost V5
-# Part of Claude Code Superboost by ISYNCSO (https://isyncso.com)
+# superboost-banner.sh — SessionStart hook for HYVES CODE V5 (formerly Superboost;
+# scripts keep the historical superboost- filename prefix so settings.json wiring
+# and env vars stay stable across the rebrand)
+# Part of HYVES CODE by ISYNCSO (https://isyncso.com)
 #
 # On every session start:
-#   1. Runs a self-test to verify all Superboost components are intact
+#   1. Runs a self-test to verify all HYVES CODE components are intact
 #   2. Collects live system stats
-#   3. Outputs banner + health report for Claude to display
+#   3. Emits the HYVES CODE banner block for Claude to open its first reply with
 # Save to: ~/.claude/hooks/superboost-banner.sh
 
-SUPERBOOST_VERSION="5.2"
+SUPERBOOST_VERSION="5.2.1"
 HOOKS_DIR="$HOME/.claude/hooks"
 SETTINGS="$HOME/.claude/settings.json"
 CLAUDE_MD="$HOME/.claude/CLAUDE.md"
@@ -50,10 +52,10 @@ else
   check_fail "settings.json not found at $SETTINGS"
 fi
 
-# 3. CLAUDE.md exists and contains Superboost v4 content
+# 3. CLAUDE.md exists and contains HYVES CODE V5 content
 if [ -f "$CLAUDE_MD" ]; then
   check_pass
-  grep -q "Superboost v5" "$CLAUDE_MD" 2>/dev/null && check_pass || check_warn "CLAUDE.md doesn't reference Superboost v5"
+  grep -q "HYVES CODE V5" "$CLAUDE_MD" 2>/dev/null && check_pass || check_warn "CLAUDE.md doesn't reference HYVES CODE V5"
   grep -q "Auto-Router" "$CLAUDE_MD" 2>/dev/null && check_pass || check_warn "CLAUDE.md missing Auto-Router"
   grep -q "Model Tiering" "$CLAUDE_MD" 2>/dev/null && check_pass || check_warn "CLAUDE.md missing Model Tiering"
   grep -q "safety-guard" "$CLAUDE_MD" 2>/dev/null && check_pass || check_warn "CLAUDE.md missing safety-guard reference"
@@ -179,19 +181,38 @@ fi
 PARA_LINE="$("$HOOKS_DIR/superboost-parallelism.sh" --line 2>/dev/null)"
 [ -z "$PARA_LINE" ] && PARA_LINE="Parallelism budget: (unavailable)"
 
-# ─── Output (v4+: silent on success; surface ONLY problems) ───
-# v3.0 forced Claude to render a full marketing banner as its first output every
-# session. v4/v5 run the self-test silently and only speak up when something is wrong.
+# ─── Banner block (v5.2.1, user-requested): Claude OPENS its first reply with
+# this exact two-liner in a fenced code block — the visible HYVES CODE boot mark.
+# (The hyves-boot.sh cinema stays installer-only: hook stdout is model context,
+# so a hook can never paint the terminal itself — the model renders the banner.)
+FANOUT_MODE=$(printf '%s' "$PARA_LINE" | sed -n 's/.*mode=\([a-z]*\).*/\1/p')
+[ -z "$FANOUT_MODE" ] && FANOUT_MODE="?"
+BANNER_L1="⬢ HYVES CODE V5 — Holistic Yield & Validation Engines · ISYNCSO"
+BANNER_L2="⬢ boot ${PASS}/${TOTAL} · RAM ${AVAIL_GB} GB free · ${STATUS} · fan-out ${FANOUT_MODE}~${MAX_AGENTS}"
+
+# ─── Output ───
+# v3.0 forced a full marketing banner; v4/v5 went silent-on-success; v5.2.1
+# reinstates a DELIBERATE, compact boot mark (two lines) by user request —
+# the self-test itself still reports detail only when something is wrong.
 if [ $FAIL -gt 0 ] || [ $WARN -gt 0 ]; then
 cat <<EOF
-SUPERBOOST V5 ACTIVE (tuned for Claude Fable 5) — the boot self-test found issues. Surface these to the user so they can repair the install, then proceed with their request:
+HYVES CODE V5 ACTIVE (tuned for Claude Fable 5) — the boot self-test found issues. Open your FIRST reply with this exact banner in a fenced code block:
+
+${BANNER_L1}
+${BANNER_L2}
+
+then surface these issues to the user so they can repair the install, and proceed with their request:
 ${ISSUE_BLOCK}
 ${PARA_LINE}
-(Superboost v${SUPERBOOST_VERSION} | ${SELFTEST_ICON} ${PASS}/${TOTAL} checks | RAM ${AVAIL_GB} GB free | ${STATUS})
+(HYVES CODE v${SUPERBOOST_VERSION} | ${SELFTEST_ICON} ${PASS}/${TOTAL} checks | RAM ${AVAIL_GB} GB free | ${STATUS})
 EOF
 else
 cat <<EOF
-SUPERBOOST V5 ACTIVE (tuned for Claude Fable 5) — boot OK (${PASS}/${TOTAL} checks), RAM ${AVAIL_GB} GB free, ${STATUS}. Do NOT render a banner; proceed directly with the user's request.
+HYVES CODE V5 ACTIVE (tuned for Claude Fable 5) — boot OK (${PASS}/${TOTAL} checks), RAM ${AVAIL_GB} GB free, ${STATUS}. Open your FIRST reply in this session with the exact two-line banner below in a fenced code block (verbatim, no other preamble before it), then proceed directly with the user's request:
+
+${BANNER_L1}
+${BANNER_L2}
+
 ${PARA_LINE}  ->  Size sub-agent/Workflow fan-out to this budget (wide when RAM is ample, solo when tight). Fable 5's async sub-agents are dependable: when the budget says "wide", prefer delegate-and-keep-working over spawn-and-block.
 EOF
 fi

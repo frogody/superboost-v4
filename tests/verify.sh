@@ -26,8 +26,14 @@ for b in superboost-banner safety-guard resource-guard ram-monitor superboost-fx
 done
 
 say "banner self-test"
-LINE="$("$HOOKS/superboost-banner.sh" 2>/dev/null | head -1)"
-case "$LINE" in *"boot OK"*) echo "  ok   ${LINE%%. Do NOT*}" ;; *) echo "  FAIL banner: $LINE"; FAILS=$((FAILS+1)) ;; esac
+BANNER="$("$HOOKS/superboost-banner.sh" 2>/dev/null)"
+LINE="$(printf '%s\n' "$BANNER" | head -1)"
+case "$LINE" in
+  "HYVES CODE V5 ACTIVE"*"boot OK"*) echo "  ok   ${LINE%%. Open your*}" ;;
+  *) echo "  FAIL banner: $LINE"; FAILS=$((FAILS+1)) ;;
+esac
+# v5.2.1: the hook must supply the two-line boot mark the model opens with
+t "banner block present" "printf '%s' \"\$BANNER\" | grep -q '⬢ HYVES CODE V5' && printf '%s' \"\$BANNER\" | grep -q '⬢ boot '"
 
 say "safety-guard matrix"
 python3 "$TESTS/guard-test.py" | tail -1

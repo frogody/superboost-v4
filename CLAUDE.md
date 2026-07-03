@@ -1,8 +1,8 @@
-# Superboost v5.2.1 "Hyves" — Global Configuration (tuned for Claude Fable 5)
+# HYVES CODE V5 (v5.2.1) — Global Configuration (tuned for Claude Fable 5)
 
-Everything in this file is part of Superboost v5.2 (brand: **HYVES CODE V5** — Holistic Yield & Validation Engines, by ISYNCSO). It activates when the SessionStart hook (`~/.claude/hooks/superboost-banner.sh`) fires — you'll see **"SUPERBOOST V5 ACTIVE"** in your system context.
+Everything in this file is part of **HYVES CODE V5** (Holistic Yield & Validation Engines, by ISYNCSO — formerly "Superboost"; the hook scripts, env vars, and internal identifiers keep the historical `superboost-` prefix so nothing rewires). It activates when the SessionStart hook (`~/.claude/hooks/superboost-banner.sh`) fires — you'll see **"HYVES CODE V5 ACTIVE"** in your system context.
 
-**Activation check:** If your system context contains "SUPERBOOST V5 ACTIVE", these rules apply. If it does not, Superboost is not installed and you should IGNORE everything below.
+**Activation check:** If your system context contains "HYVES CODE V5 ACTIVE" (or the pre-rebrand "SUPERBOOST V5 ACTIVE"), these rules apply. If it contains neither, HYVES CODE is not installed and you should IGNORE everything below.
 
 **What v5 is:** v4's philosophy — *enforce with hooks, don't narrate with ceremony; lean on the native harness (Workflow tool, agent teams) over hand-rolled orchestration* — retuned for **Claude Fable 5** as the default model, plus two new capabilities: **RAM-scaled parallelism** (size fan-out to free memory, §10) and a **colored terminal FX layer** (§11). The default model is `fable[1m]` with an `availableModels` allowlist, so if Fable 5 isn't accessible Claude Code degrades to Opus 4.8 with a warning rather than failing. **v5.2 "Hyves" adds:** a LIVE parallelism budget (re-injected per turn the moment the posture changes, §10), outcome-aware FX (test/build results wash the bar PASS-green/FAIL-red, §11), event-typed statusline motion, and the `hyves-boot.sh` decrypt boot cinema for installer moments. **v5.2.1 (frame-capture verified):** float animation clock end-to-end (fx.sh emits a float epoch — integer truncation started phases up to 1s late), a guaranteed ≥18-cell FX stage at common widths (density chips shed statically so motion never turns to mush and the layout never shifts mid-effect), and a committed regression harness (`tests/verify.sh` quick suite + `tests/deepcap.py` deep animation captures).
 
@@ -10,9 +10,9 @@ Everything in this file is part of Superboost v5.2 (brand: **HYVES CODE V5** —
 
 ---
 
-## 1. Boot check (silent)
+## 1. Boot check + boot mark
 
-The SessionStart hook runs an install self-test (scripts present + executable, settings wired, checksums un-drifted) **silently**, and emits the current **parallelism budget** (§10) into context. On a clean boot it says so in one line — **do not render a banner**. Only if the self-test reports FAIL/WARN, surface those issues to the user so they can repair the install, then continue.
+The SessionStart hook runs an install self-test (scripts present + executable, settings wired, checksums un-drifted) and emits the current **parallelism budget** (§10) into context, along with a **two-line HYVES CODE banner block**. **Open your FIRST reply of the session with that banner, verbatim, in a fenced code block** (v5.2.1, user-requested — this is the one deliberate piece of boot ceremony), then proceed with the user's request. If the self-test reports FAIL/WARN, also surface those issues so the user can repair the install, then continue. Render the banner exactly once per session — never repeat it on later turns.
 
 ---
 
@@ -41,7 +41,7 @@ Manual reads: `~/.claude/hooks/resource-check.sh` (`--quiet` for JSON) · `~/.cl
 For multi-agent work, use the **Workflow tool** — it handles concurrency capping (min(16, cores−2)), a shared token budget, resume, and a live `/workflows` progress UI. Don't hand-roll wave loops, rate-limit "zones", or progress bars. Patterns worth composing: pipeline fan-out, adversarial verify, judge panel, MoA (independent solvers → synthesizer), loop-until-dry.
 
 - Cap Workflow concurrency at the parallelism budget's `workflow_width` (§10), not just the harness default.
-- **MoA / synthesis** and **model-tiering** have no native auto-equivalent — those are where Superboost adds value (§5).
+- **MoA / synthesis** and **model-tiering** have no native auto-equivalent — those are where HYVES CODE adds value (§5).
 - For code-quality review of a diff, prefer `/code-review` (or `/code-review ultra`) over a hand-built judge.
 - Sub-agents do **not** inherit this file. Put everything they need directly in their prompt (clear task, success criteria, constraints, relevant paths, and the *Why* — see §9). That discipline matters; a printed ceremony announcing it does not.
 
@@ -121,7 +121,7 @@ Fable 5 behaves differently from the Opus family. These are the levers that matt
 - **mode `balanced`** (3–7) → fan out for genuinely independent streams; keep sequential work solo.
 - **mode `narrow`/`solo`** (≤2 / can't spawn) → one helper at most, or solo.
 
-The SessionStart banner emits this line into context every session, and the statusline shows it live as `fanout~N`. **v5.2:** a `UserPromptSubmit` hook (`--turn`) re-emits the line into context the moment the mode flips (wide↔balanced↔narrow↔solo) — so the budget in context is never stale; a silent turn means "unchanged". Before a large fan-out, glance at (or re-query) the budget and size the work to it. When RAM is ample, **use it** — wide async delegation is where Fable 5 + Superboost beats Fable 5 alone; when RAM is tight, the guard (§3) and the budget both tell you to stay solo.
+The SessionStart banner emits this line into context every session, and the statusline shows it live as `fanout~N`. **v5.2:** a `UserPromptSubmit` hook (`--turn`) re-emits the line into context the moment the mode flips (wide↔balanced↔narrow↔solo) — so the budget in context is never stale; a silent turn means "unchanged". Before a large fan-out, glance at (or re-query) the budget and size the work to it. When RAM is ample, **use it** — wide async delegation is where Fable 5 + HYVES CODE beats Fable 5 alone; when RAM is tight, the guard (§3) and the budget both tell you to stay solo.
 
 ---
 
@@ -141,4 +141,4 @@ The statusline (v5.2) is a **full-width HUD painted with truecolor backgrounds**
 
 ---
 
-*Superboost v5.2.1 "Hyves" — HYVES CODE V5 · ISYNCSO · github.com/frogody/superboost-v5*
+*HYVES CODE V5 (v5.2.1) — formerly Superboost · ISYNCSO · github.com/frogody/hyves-code*

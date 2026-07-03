@@ -102,6 +102,12 @@ else                               CAP="solo";                 CAP_R=239; CAP_G=
 # --- FX state (effect color + freshness) ---
 FX_STATE="${SUPERBOOST_FX_DIR:-$HOME/.claude/fx}/state"
 NOW=$(date +%s 2>/dev/null); [ -z "$NOW" ] && NOW=0
+# v5.2.1: FLOAT clock for animation phases. The statusline re-renders ~every
+# 300ms, but keying motion off integer seconds froze it to 1 fps and made the
+# scanner teleport (2.2 rad/integer-step ~ 126 deg jumps). BSD date has no %N;
+# perl's Time::HiRes is on every macOS. Falls back to integer seconds.
+NOW_F=$(perl -MTime::HiRes=time -e 'printf "%.2f", time' 2>/dev/null)
+[ -z "$NOW_F" ] && NOW_F=$NOW
 FX_ON=0; FX_EVENT=""; FX_LABEL=""; FX_R=0; FX_G=0; FX_B=0; FX_AGE=0; FX_TTL=7
 if [ -f "$FX_STATE" ]; then
   IFS='|' read -r FX_EVENT FX_LABEL FX_R FX_G FX_B _t FX_TTL < "$FX_STATE" 2>/dev/null
@@ -112,9 +118,10 @@ if [ -f "$FX_STATE" ]; then
 fi
 # v5.2: smoothstep ease-out decay + gentle sine pulse (~0.4 Hz, <10% luminance
 # swing — WCAG 2.3.1-safe; replaces linear decay + the 4-frame table). Scales 0-100.
-read -r DECAY PULSE <<<"$(awk -v age="$FX_AGE" -v ttl="$FX_TTL" -v now="$NOW" 'BEGIN{
-  a=(ttl>0)?1-age/ttl:0; if(a<0)a=0; if(a>1)a=1; a=a*a*(3-2*a)
-  p=0.90+0.10*sin(now*2.6)
+# v5.2.1: phases run on the float clock so decay/pulse glide between renders.
+read -r DECAY PULSE <<<"$(awk -v t="${_t:-0}" -v ttl="$FX_TTL" -v nowf="$NOW_F" 'BEGIN{
+  agef=nowf-t; a=(ttl>0)?1-agef/ttl:0; if(a<0)a=0; if(a>1)a=1; a=a*a*(3-2*a)
+  p=0.90+0.10*sin(nowf*2.6)
   printf "%d %d", a*100+0.5, p*100+0.5 }')"
 : "${PULSE:=100}"; : "${DECAY:=0}"
 [ "$FX_ON" = "1" ] || DECAY=0
@@ -198,20 +205,25 @@ RAMBAR=$(awk -v n="$RB" -v used="$USED_PCT" 'BEGIN{
 # fanout/deploy get a Larson scanner, commit a one-shot L->R sweep. All positions
 # are pure functions of wall-clock, so a paused frame is a valid still. ---
 if [ "$FX_ON" = "1" ] && [ "$CANVAS" -gt 0 ]; then
-  WASH=$(awk -v n="$CANVAS" -v now="$NOW" -v age="$FX_AGE" -v dec="$DECAY" -v pul="$PULSE" \
+  WASH=$(awk -v n="$CANVAS" -v now="$NOW" -v t="${_t:-0}" -v nowf="$NOW_F" \
+             -v dec="$DECAY" -v pul="$PULSE" \
              -v ev="$FX_EVENT" \
              -v fr="$FX_R" -v fg="$FX_G" -v fb="$FX_B" \
              -v br="$B0_R" -v bg="$B0_G" -v bb="$B0_B" 'BEGIN{
     e=sprintf("%c",27); nb=int((n+2)/3); out=""
+    agef=nowf-t; if(agef<0)agef=0
     scan=-1; sweep=-1
-    if(ev=="fanout"||ev=="deploy"){ scan=(n-1)*(0.5+0.5*sin(now*2.2)) }
-    else if(ev=="commit" && age<3){ sweep=n*age/3.0 }
+    # v5.2.1: phases on the float clock -> the head GLIDES between renders.
+    # Scanner bounce period ~3.5s (1.8 rad/s); sweep crosses in 3s.
+    if(ev=="fanout"||ev=="deploy"){ scan=(n-1)*(0.5+0.5*sin(nowf*1.8)) }
+    else if(ev=="commit" && agef<3){ sweep=n*agef/3.0 }
     for(i=0;i<n;i++){
       j=int(i/3)
       g=(nb<=1)?1:(j/(nb-1))              # 0 far-left .. 1 at the label (right)
       base=g*sqrt(g)                       # glow falls off with distance (g^1.5)
-      s=0.5+0.5*sin(i*0.35+now*2.0)        # 1D plasma shimmer (slow, subtle)
+      s=0.5+0.5*sin(i*0.35+nowf*2.0)       # 1D plasma shimmer (slow, subtle)
       base*=0.72+0.28*s
+      if(scan>=0 || sweep>=0) base*=0.45   # dim the glow so the moving head reads
       a=base*(dec/100.0)*(pul/100.0)
       if(scan>=0){ d=i-scan; sig=n/10.0; if(sig<2)sig=2; a+=0.9*exp(-d*d/(2*sig*sig))*(dec/100.0) }
       if(sweep>=0){ d=i-sweep; sig=n/14.0; if(sig<2)sig=2; a+=0.8*exp(-d*d/(2*sig*sig)) }

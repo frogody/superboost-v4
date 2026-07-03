@@ -1,4 +1,4 @@
-# HYVES CODE V5 (v5.4.1) — Global Configuration (tuned for Claude Fable 5)
+# HYVES CODE V5 (v5.4.2) — Global Configuration (tuned for Claude Fable 5)
 
 Everything in this file is part of **HYVES CODE V5** (Holistic Yield & Validation Engines, by ISYNCSO — formerly "Superboost"; the hook scripts, env vars, and internal identifiers keep the historical `superboost-` prefix so nothing rewires). It activates when the SessionStart hook (`~/.claude/hooks/superboost-banner.sh`) fires — you'll see **"HYVES CODE V5 ACTIVE"** in your system context.
 
@@ -162,7 +162,7 @@ Act on these lines when they appear — they are computed from the live session,
 - **Phase events (v5.3):** turn start washes `turn` (WORKING, 3s) via UserPromptSubmit; a finished sub-agent washes `join` via SubagentStop; waiting-on-you (permission prompt / idle / agent-needs-input) washes pink `attn` (45s) via the Notification hook; context compaction washes amber `compact` via PreCompact. SessionEnd still *clears* (a fade would be unseeable — the TUI exits with the session; hygiene wins).
 - **Long-turn heartbeat (v5.3):** when an effect expires mid-turn (last event isn't `done`/`attn`), the canvas shows a faint drifting slate shimmer — an active turn is visibly alive without faking an event. Capped at 15 min.
 - **Manual** — `~/.claude/hooks/superboost-fx.sh emit preflight` · also `fanout|join|commit|deploy|blocked|edit|search|think|turn|compact|error|attn|done|pass|fail`. Use to mark meaningful phase changes.
-- Effects carry **per-event TTLs** (turn=3s, attn=45s, rest 7s); `SUPERBOOST_FX_TTL` overrides for demos. Motion: 1D plasma shimmer, <10% sine pulse (~0.4 Hz, WCAG 2.3.1-safe), Larson scanner on fanout/deploy, one-shot L→R sweep on commit; all motion is a pure function of wall-clock (float epoch), so a paused frame is a valid still. Floored falloff lights the whole canvas; decay holds full strength to 35% of TTL then eases to zero.
+- Effects carry **per-event TTLs** (turn=3s, attn=45s, rest 7s); `SUPERBOOST_FX_TTL` overrides for demos. **Intensity dial (v5.4.2):** `SUPERBOOST_FX_INTENSITY` = `normal` | `low` (same full-canvas coverage at ~half the luminance, measured 0.48×) | `off` (no canvas wash/heartbeat; the label chip still names the event). Motion: 1D plasma shimmer, <10% sine pulse (~0.4 Hz, WCAG 2.3.1-safe), Larson scanner on fanout/deploy, one-shot L→R sweep on commit; all motion is a pure function of wall-clock (float epoch), so a paused frame is a valid still. Floored falloff lights the whole canvas; decay holds full strength to 35% of TTL then eases to zero.
 - **Session-scoped state (v5.3):** hooks write `~/.claude/fx/state.<sid8>` keyed by their stdin `session_id`; manual emits write the global `state`; the statusline renders whichever record is newest for its own session — concurrent sessions no longer clobber each other's effects, and SessionEnd clears only its own file (stale siblings pruned after 4h). Writes are atomic (tmp+rename) — the old truncating write tore 15% of concurrent reads.
 - **Attention pushes (v5.4)** — the two moments the terminal itself cannot carry become native macOS notifications: *Claude needs you* (permission prompt / idle / agent-needs-input, with the message + project dir) and *Claude finished* after a turn ran ≥45s (`SUPERBOOST_PUSH_LONG_TURN_SEC`). Gated: `SUPERBOOST_PUSH=0` disables, 90s rate limit, suppressed while a terminal app is frontmost (`SUPERBOOST_PUSH=2` forces), macOS-only. No extra wiring — rides the Notification/UserPromptSubmit/Stop hooks.
 - **Cost ledger + `hyves` CLI (v5.4)** — SessionEnd folds each session's final `cost/dir` snapshot into `~/.claude/logs/cost-ledger.tsv`; `~/.claude/hooks/hyves.sh` is the front door: `hyves status|doctor [--full]|stats [days]|demo|update|version` (alias it: `alias hyves=~/.claude/hooks/hyves.sh`).
@@ -172,4 +172,4 @@ The statusline is a **full-width HUD painted with truecolor backgrounds** (chips
 
 ---
 
-*HYVES CODE V5 (v5.4.1) — formerly Superboost · ISYNCSO · github.com/frogody/hyves-code*
+*HYVES CODE V5 (v5.4.2) — formerly Superboost · ISYNCSO · github.com/frogody/hyves-code*

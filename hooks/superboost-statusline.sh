@@ -214,6 +214,14 @@ if [ "$FX_ON" = "0" ] && [ -n "$_t_i" ] && [ -n "$FX_TTL" ]; then
     *) [ "$FX_AGE" -ge "$FX_TTL" ] && [ "$FX_AGE" -lt 900 ] && HEART=1 ;;
   esac
 fi
+# v5.4.2 intensity dial: SUPERBOOST_FX_INTENSITY = normal (v5.2.2 punchy
+# levels) | low (same full-canvas coverage, ~half the luminance) | off (no
+# canvas wash/heartbeat at all — the label chip still names the event).
+FXI="${SUPERBOOST_FX_INTENSITY:-normal}"
+case "$FXI" in low|off|normal) : ;; *) FXI="normal" ;; esac
+if [ "$FXI" = "low" ]; then A1=10; A2=18; A3=28; A4=38; TINT_MAX=7; HB_AL=8
+else                        A1=20; A2=40; A3=62; A4=82; TINT_MAX=14; HB_AL=14; fi
+
 # v5.2: smoothstep ease-out decay + gentle sine pulse (~0.4 Hz, <10% luminance
 # swing — WCAG 2.3.1-safe; replaces linear decay + the 4-frame table). Scales 0-100.
 # v5.2.1: phases run on the float clock so decay/pulse glide between renders.
@@ -231,8 +239,8 @@ read -r DECAY PULSE <<<"$(awk -v t="${_t:-0}" -v ttl="$FX_TTL" -v nowf="$NOW_F" 
 
 # --- Base strip color: dark slate, tinted faintly toward an active effect ---
 B0_R=22; B0_G=24; B0_B=31
-if [ "$FX_ON" = "1" ]; then
-  _tint=$(( 14 * DECAY * PULSE / 10000 ))   # 0..14% toward effect color
+if [ "$FX_ON" = "1" ] && [ "$FXI" != "off" ]; then
+  _tint=$(( TINT_MAX * DECAY * PULSE / 10000 ))   # 0..TINT_MAX% toward effect color
   B0_R=$(( B0_R + (FX_R - B0_R) * _tint / 100 ))
   B0_G=$(( B0_G + (FX_G - B0_G) * _tint / 100 ))
   B0_B=$(( B0_B + (FX_B - B0_B) * _tint / 100 ))
@@ -331,9 +339,10 @@ RAMBAR=$(awk -v n="$RB" -v used="$USED_PCT" \
 # v5.2: 1D plasma shimmer within the effect color, plus event-typed motion —
 # fanout/deploy get a Larson scanner, commit a one-shot L->R sweep. All positions
 # are pure functions of wall-clock, so a paused frame is a valid still. ---
-if [ "$FX_ON" = "1" ] && [ "$CANVAS" -gt 0 ]; then
+if [ "$FX_ON" = "1" ] && [ "$CANVAS" -gt 0 ] && [ "$FXI" != "off" ]; then
   WASH=$(awk -v n="$CANVAS" -v now="$NOW" -v t="${_t:-0}" -v nowf="$NOW_F" \
              -v dec="$DECAY" -v pul="$PULSE" \
+             -v a1="$A1" -v a2="$A2" -v a3="$A3" -v a4="$A4" \
              -v ev="$FX_EVENT" \
              -v fr="$FX_R" -v fg="$FX_G" -v fb="$FX_B" \
              -v br="$B0_R" -v bg="$B0_G" -v bb="$B0_B" 'BEGIN{
@@ -362,21 +371,21 @@ if [ "$FX_ON" = "1" ] && [ "$CANVAS" -gt 0 ]; then
       if(d2==0 && lvl>0) lvl--
       if(d2==3 && lvl<4 && lvl>0) lvl++
       if(lvl<0)lvl=0; if(lvl>4)lvl=4
-      al=(lvl==0)?0:(lvl==1)?20:(lvl==2)?40:(lvl==3)?62:82   # alpha % (v5.2.2: punchier)
+      al=(lvl==0)?0:(lvl==1)?a1:(lvl==2)?a2:(lvl==3)?a3:a4   # alpha % per intensity dial
       r=br+int((fr-br)*al/100); gg=bg+int((fg-bg)*al/100); bl=bb+int((fb-bb)*al/100)
       out=out e "[48;2;" r ";" gg ";" bl "m "
     }
     printf "%s", out
   }')
-elif [ "$HEART" = "1" ] && [ "$CANVAS" -gt 0 ]; then
+elif [ "$HEART" = "1" ] && [ "$CANVAS" -gt 0 ] && [ "$FXI" != "off" ]; then
   # heartbeat: sparse slate cells drifting slowly right (~0.9 rad/s phase), a
   # pure function of wall-clock. Quiet by design — "alive", not "an event".
-  WASH=$(awk -v n="$CANVAS" -v nowf="$NOW_F" \
+  WASH=$(awk -v n="$CANVAS" -v nowf="$NOW_F" -v hal="$HB_AL" \
              -v br="$B0_R" -v bg="$B0_G" -v bb="$B0_B" 'BEGIN{
     e=sprintf("%c",27); out=""
     for(i=0;i<n;i++){
       s=sin(i*0.35 - nowf*0.9)
-      al=(s>0.60)?14:0
+      al=(s>0.60)?hal:0
       r=br+int((100-br)*al/100); g=bg+int((116-bg)*al/100); bl=bb+int((139-bb)*al/100)
       out=out e "[48;2;" r ";" g ";" bl "m "
     }

@@ -159,6 +159,52 @@ t "hyves version"              "'$HY' version | grep -q 'HYVES CODE v'"
 t "hyves stats reads ledger"   "SUPERBOOST_LEDGER='$FXR/ledger.tsv' '$HY' stats 7 | grep -q 'radarproj'"
 rm -rf "$FXR"
 
+say "fx intensity dial (v5.4.2)"
+FXI_D=$(mktemp -d "${TMPDIR:-/tmp}/hyves-fxi.XXXXXX")
+cat > "$FXI_D/dial.py" <<'PYEOF'
+import os, re, subprocess, sys, time
+sys.path.insert(0, os.path.expanduser("~/.claude/tests"))
+from fxcap import cells, canvas_profile, wash_run
+SL = os.path.expanduser("~/.claude/hooks/superboost-statusline.sh")
+fxd = sys.argv[1]
+rich = ('{"session_id":"dial-1","model":{"display_name":"Fable 5"},'
+        '"cost":{"total_cost_usd":1},"context_window":{"used_percentage":42.5},'
+        '"rate_limits":{"five_hour":{"used_percentage":10}},"effort":{"level":"xhigh"},'
+        '"workspace":{"current_dir":"/tmp/proj"}}')
+with open(os.path.join(fxd, "state"), "w") as f:
+    f.write(f"commit|COMMIT|34|197|94|{time.time():.2f}|7\n")
+def render(intensity):
+    env = {**os.environ, "COLUMNS": "150", "SUPERBOOST_FX_DIR": fxd,
+           "SUPERBOOST_FX_INTENSITY": intensity}
+    return subprocess.run([SL], input=rich, capture_output=True, text=True,
+                          env=env).stdout.rstrip("\n")
+def energy(frame):
+    best = wash_run(frame, canvas_profile(frame, 34, 197, 94), "COMMIT")
+    return 0.0 if best is None else sum(best[1])
+n = energy(render("normal"))
+l = energy(render("low"))
+off_frame = render("off")
+o = energy(off_frame)
+plain = re.sub(r"\x1b\[[0-9;]*m", "", off_frame)
+junk = render("circus")  # unknown value -> treated as normal, width law holds
+junk_w = len(re.sub(r"\x1b\[[0-9;]*m", "", junk))
+checks = {
+    "normal lights": n > 1.0,
+    "low dims <0.7x": 0 < l < 0.7 * n,
+    "off no wash": o < 0.05,
+    "off keeps label": " COMMIT " in plain,
+    "off width law": len(plain) == 145,
+    "unknown=normal width": junk_w == 145,
+}
+print(f"  energies: normal={n:.2f} low={l:.2f} off={o:.2f}")
+bad = [k for k, v in checks.items() if not v]
+if bad:
+    print("  BAD:", bad)
+sys.exit(1 if bad else 0)
+PYEOF
+t "intensity dial low/off/junk"    "python3 '$FXI_D/dial.py' '$FXI_D'"
+rm -rf "$FXI_D"
+
 say "resource probe json"
 t "resource-check valid JSON"  "'$HOOKS/resource-check.sh' --quiet | python3 -c 'import sys,json; json.load(sys.stdin)'"
 t "available_gb leading digit" "'$HOOKS/resource-check.sh' --quiet | grep -Eq '\"available_gb\":[0-9]'"

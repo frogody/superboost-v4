@@ -2,7 +2,7 @@
 
 *Holistic Yield & Validation Engines* — formerly **Superboost**. The internal hook scripts, env vars, and sentinels keep the historical `superboost-` prefix, so upgrading is a `git pull`, not a migration.
 
-![version](https://img.shields.io/badge/HYVES%20CODE-V5.4.1-a855f7)
+![version](https://img.shields.io/badge/HYVES%20CODE-V5.4.2-a855f7)
 ![Claude Code](https://img.shields.io/badge/Claude%20Code-%E2%89%A5%202.1.170-22d3ee)
 ![tuned for](https://img.shields.io/badge/tuned%20for-Claude%20Fable%205-facc15)
 ![safety](https://img.shields.io/badge/auto--mode-guarded-22c55e)
@@ -96,6 +96,8 @@ Requires **Claude Code ≥ 2.1.170** (for Fable 5) — run `claude update` if ne
 ## What's new in v5.4.1 — quiet by default
 
 User feedback on 5.4.0: *"it looks like a circus."* Correct. The steady-state bar now renders **neutral slate unless something needs you**: single-hue RAM bar (amber ≥75%, red ≥85%), neutral readouts until pressure, desaturated churn, gold *text* instead of a gold slab for the model chip. Color belongs to events (washes) and alerts (`200K+`, ctx ≥85%, `tight`/`solo`) — and now it's the exception, so it reads. Measured: 28 → 11 distinct colors in a steady-state render.
+
+**v5.4.2 adds the wash dial:** `SUPERBOOST_FX_INTENSITY=low` keeps every event visible at ~half the luminance (0.48× measured); `off` drops the canvas wash entirely and keeps the label chip. Default `normal` stays the screenshot-verified punchy level.
 
 ---
 

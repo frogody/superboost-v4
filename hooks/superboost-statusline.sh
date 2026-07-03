@@ -113,14 +113,14 @@ W=$(( ${COLUMNS:-$(tput cols 2>/dev/null || echo 120)} - 5 ))
 
 # ============================ PLAIN / NARROW FALLBACK =========================
 plain_line() {
-  printf 'SUPERBOOST | RAM %s%% | %sGB free | %s | %s $%.2f\n' \
+  printf 'HYVES CODE V5 | RAM %s%% | %sGB free | %s | %s $%.2f\n' \
     "$USED_PCT" "$AVAIL_GB" "$CAP" "$MODEL" "$COST"
 }
 if [ "$PLAIN" = "1" ]; then plain_line; exit 0; fi
 
 # ============================ FULL-WIDTH RENDER ===============================
 # Fixed-text pieces (visible lengths tracked exactly; ASCII only)
-BRAND_TXT=" SUPERBOOST "
+BRAND_TXT=" HYVES CODE V5 "
 MODEL_TXT=" ${MODEL}"
 [ "$EFFORT" != "-" ] && MODEL_TXT="${MODEL_TXT} ${EFFORT}"
 MODEL_TXT="${MODEL_TXT} "

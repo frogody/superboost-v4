@@ -5,6 +5,7 @@
 
 # --- Authored config worth versioning ---
 !/.gitignore
+!/README.md
 !/CLAUDE.md
 !/settings.json
 !/superboost-version.json
